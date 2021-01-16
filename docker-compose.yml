@@ -1,0 +1,56 @@
+version: "3.7"
+
+services:
+
+  app:
+    build:
+      args:
+        user: ${user}
+        uid: ${uid}
+      context: ./.docker/php
+      dockerfile: Dockerfile
+    container_name: app
+    restart: unless-stopped
+    ports:
+    - "${PORT_APP}:${PORT_APP}"
+    working_dir: /var/www/html/
+    volumes:
+      - ./src:/var/www/html/
+      - ./.docker/php/config/php.ini:/usr/local/etc/php/conf.d/php.ini
+    networks:
+      - back
+
+  db:
+    image: library/mysql:8
+    container_name: db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
+    volumes:
+      - ./.docker/mysql/data:/docker-entrypoint-initdb.d
+      - ./.docker/mysql/config:/etc/mysql/conf.d
+      - persistent:/var/lib/mysql
+    networks:
+      - back
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    restart: unless-stopped
+    ports:
+      - "${PORT_NGINX}:${PORT_NGINX}"
+    volumes:
+      - ./src:/var/www/html/
+      - ./.docker/nginx:/etc/nginx/conf.d
+    networks:
+      - back
+
+networks:
+  back:
+    driver: bridge
+
+volumes:
+  persistent:
