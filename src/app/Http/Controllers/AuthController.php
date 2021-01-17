@@ -31,7 +31,7 @@ class AuthController extends Controller
             'email' => $user->email
         ]]);
 
-        return redirect('/');
+        return redirect(route('dashboard.index'));
     }
 
     public function showRegisterForm()
@@ -60,6 +60,6 @@ class AuthController extends Controller
         $user->password = md5($request->password);
         $user->save();
 
-        $this->login($request);
+        return $this->login($request);
     }
 }
