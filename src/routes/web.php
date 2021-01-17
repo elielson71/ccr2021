@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use \App\Http\Controllers\AuthController;
+use \App\Http\Controllers\Dashboard;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,4 +24,8 @@ Route::prefix('user')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->name('user.login');
     Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('user.register');
     Route::post('/register', [AuthController::class, 'register'])->name('user.register');
+});
+
+Route::prefix('dashboard')->middleware('loginCheck')->group(function () {
+    Route::get('/', [Dashboard::class, 'showIndex'])->name('dashboard.index');
 });
